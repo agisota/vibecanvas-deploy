@@ -10,6 +10,9 @@ RUN bun init -y && \
     find node_modules -name opencode -path '*/bin/*' -exec chmod +x {} \; && \
     echo "opencode version:" && /app/node_modules/.bin/opencode --version || true
 
+# Remove non-baseline vibecanvas binary so the wrapper picks baseline
+RUN rm -rf /app/node_modules/vibecanvas-linux-x64 || true
+
 COPY proxy.cjs /app/proxy.cjs
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
