@@ -1,10 +1,8 @@
 FROM oven/bun:1-debian
 
-RUN apt-get update && apt-get install -y nodejs npm && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y nodejs && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-RUN npm install http-proxy
 
 RUN bun init -y && \
     bun add vibecanvas@0.1.8 opencode-ai@latest && \
