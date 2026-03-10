@@ -9,7 +9,7 @@ RUN bun init -y && \
     find node_modules -name vibecanvas -path '*/bin/*' -exec chmod +x {} \; && \
     find node_modules/.bin -name opencode -exec chmod +x {} \;
 
-COPY proxy.js /app/proxy.js
+COPY proxy.cjs /app/proxy.cjs
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
