@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: vibecanvas
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: "7496"
