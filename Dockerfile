@@ -5,6 +5,10 @@ WORKDIR /app
 RUN bun init -y && bun add vibecanvas@0.1.8 && \
     find node_modules -name vibecanvas -path '*/bin/*' -exec chmod +x {} \;
 
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+ENV PORT=10000
 EXPOSE 10000
 
-CMD ["sh", "-c", "bunx vibecanvas serve --port ${PORT:-10000}"]
+CMD ["/app/start.sh"]
