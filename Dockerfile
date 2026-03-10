@@ -5,9 +5,10 @@ RUN apt-get update && apt-get install -y nodejs && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 RUN bun init -y && \
-    bun add vibecanvas@0.1.8 opencode-ai@latest && \
+    bun add --trust vibecanvas@0.1.8 opencode-ai@latest && \
     find node_modules -name vibecanvas -path '*/bin/*' -exec chmod +x {} \; && \
-    find node_modules -name opencode -path '*/bin/*' -exec chmod +x {} \;
+    find node_modules -name opencode -path '*/bin/*' -exec chmod +x {} \; && \
+    echo "opencode version:" && /app/node_modules/.bin/opencode --version || true
 
 COPY proxy.cjs /app/proxy.cjs
 COPY start.sh /app/start.sh
