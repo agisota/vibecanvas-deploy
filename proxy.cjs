@@ -1,21 +1,10 @@
 const http = require("http");
 const net = require("net");
-const fs = require("fs");
 
 const PORT = parseInt(process.env.PORT || "10000", 10);
 const TARGET = parseInt(process.env.VIBECANVAS_PORT || "10001", 10);
-const LOG_FILE = "/app/startup.log";
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/_logs") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    try {
-      res.end(fs.readFileSync(LOG_FILE, "utf8"));
-    } catch (e) {
-      res.end("No log file yet: " + e.message);
-    }
-    return;
-  }
   const opts = { hostname: "127.0.0.1", port: TARGET, path: req.url, method: req.method, headers: req.headers };
   const proxy = http.request(opts, (pRes) => {
     res.writeHead(pRes.statusCode, pRes.headers);
