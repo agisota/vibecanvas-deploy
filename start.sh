@@ -19,14 +19,25 @@ export VIBECANVAS_PORT=$INTERNAL_PORT
   echo "--- opencode packages ---"
   ls -d /app/node_modules/opencode-linux-* 2>/dev/null || echo "none"
   echo "--- opencode version ---"
-  opencode --version 2>&1 || echo "FAILED"
+  opencode --version >> "$LOG" 2>&1 || echo "FAILED"
   echo "--- vibecanvas help ---"
   vibecanvas --help 2>&1 | head -5 || echo "FAILED"
-  echo "=== Starting ==="
+  echo "=== Starting vibecanvas ==="
 } > "$LOG" 2>&1
 
-# Start reverse proxy (0.0.0.0:PORT -> 127.0.0.1:INTERNAL_PORT)
-node /app/proxy.cjs &
+# Start vibecanvas in background, log output
+vibecanvas serve --port "$INTERNAL_PORT" >> "$LOG" 2>&1 &
+VC_PID=$!
+echo "vibecanvas PID: $VC_PID" >> "$LOG"
 
-# Start vibecanvas on internal port, log output
-exec vibecanvas serve --port "$INTERNAL_PORT" >> "$LOG" 2>&1
+# Give vibecanvas a moment, check if it survived
+sleep 3
+if kill -0 $VC_PID 2>/dev/null; then
+  echo "vibecanvas is running" >> "$LOG"
+else
+  wait $VC_PID 2>/dev/null
+  echo "vibecanvas CRASHED with exit code: $?" >> "$LOG"
+fi
+
+# Proxy is PID 1 — keeps container alive even if vibecanvas crashes
+exec node /app/proxy.cjs
