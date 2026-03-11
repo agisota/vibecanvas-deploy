@@ -1,16 +1,21 @@
 #!/bin/sh
 
 export HOME=/app
-mkdir -p /app/.vibecanvas
+mkdir -p /app/.vibecanvas /app/.local/share/opencode /app/.cache/opencode /app/.local/state/opencode
 
 INTERNAL_PORT=$((${PORT:-10000} + 1))
 export VIBECANVAS_PORT=$INTERNAL_PORT
 
-# Start fake opencode server (satisfies vibecanvas startup check)
-node /app/fake-opencode.cjs &
+# Pre-start opencode serve so vibecanvas finds it ready on :4096
+opencode serve > /dev/null 2>&1 &
 
-# Wait for fake opencode to be ready
-sleep 1
+# Wait for opencode to be fully ready
+for i in $(seq 1 30); do
+  if curl -sf http://127.0.0.1:4096/global/health > /dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
 
 # Start reverse proxy (0.0.0.0:PORT -> 127.0.0.1:INTERNAL_PORT)
 node /app/proxy.cjs &
